@@ -1,43 +1,33 @@
 # Book Recommendation System
 
-Using TF-IDF (Content-Based) + KNN Collaborative Filtering + User-Based recommendations.
+A production-ready Flask API combining **Content-Based**, **KNN Collaborative Filtering**, and **SVD Matrix Factorization** for personalized book recommendations.
+
+## Features
+
+- **Combined Recommendation Engine**: 3 models (weights: content-0.2 + KNN-0.3 + SVD-0.5)
+- **Full-Text Search**: SQLite FTS for fast book search
+- **Real-time Recommendations**: Per-user personalized suggestions
+- **Modular Architecture**: Clean separation of concerns
+- **Auto-initialization**: Setup scripts run automatically on first start
+- **Production Ready**: Logging, error handling, graceful shutdown
 
 ## Quick Start
 
-### 1. Clone repository
-
-```bash
-git clone <git@github.com:Hoangvu2911/BookRecommendation_ML.git>
-cd ml2
-```
-
-### 2. Create Virtual Environment
-
-```bash
-# Linux / macOS
-python3 -m venv venv
-source venv/bin/activate
-
-# Windows
-python -m venv venv
-venv\Scripts\activate
-```
-
-### 3. Setup dependencies
+### 1. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Run
+### 2. Run Server
 
 ```bash
-python3 app.py
+python app.py
 ```
 
-### 5. Access URL
+Server automatically:
 
-```
-Frontend: http://localhost:5000
-API: http://localhost:5000/api/*
-```
+- Checks/generates models
+- Checks/creates database
+- Loads all models into RAM
+- Starts Flask server on `http://localhost:5000`

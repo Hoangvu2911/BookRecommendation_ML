@@ -15,7 +15,7 @@ warnings.filterwarnings('ignore')
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
-from surprise import Dataset, Reader, KNNWithMeans
+from surprise import Dataset, Reader, KNNWithMeans, SVD
 from surprise.model_selection import cross_validate
 import os
 
@@ -128,9 +128,40 @@ knn_model.fit(full_train)
 print(f"   ✓ KNN Model trained (k={best_k})")
 
 # ============================================================================
-# BƯỚC 5: EXPORT thành .pkl FILES
+# BƯỚC 4.5: COSINE SIMILARITY (Content-Based)
 # ============================================================================
-print("\n5. Exporting to .pkl files...")
+print("\n4.5 Computing Cosine Similarity Matrix...")
+cosine_sim = linear_kernel(tfidf_matrix, tfidf_matrix)
+print(f"   ✓ Cosine Similarity Matrix shape: {cosine_sim.shape}")
+
+# ============================================================================
+# BƯỚC 5: SVD (Collaborative Filtering - Matrix Factorization)
+# ============================================================================
+print("\n5. Training SVD Model...")
+
+# Tìm số factor tốt nhất
+print("   Searching for best number of factors...")
+number_factors = [2, 3, 4, 5, 10, 15, 20, 50, 75, 100, 150, 200]
+rmse_svd = []
+
+for factor in number_factors:
+    algo = SVD(n_factors=factor, n_epochs=30, lr_all=1e-3, reg_all=0.05, random_state=42)
+    result = cross_validate(algo, data, measures=['RMSE'], cv=5, verbose=False)
+    mean_rmse = result['test_rmse'].mean()
+    rmse_svd.append(mean_rmse)
+
+best_num_factors = number_factors[rmse_svd.index(min(rmse_svd))]
+print(f"   ✓ Best number of factors found: {best_num_factors} (RMSE: {min(rmse_svd):.4f})")
+
+# Train SVD với số factor tốt nhất
+svd_model = SVD(n_factors=best_num_factors, n_epochs=30, lr_all=1e-3, reg_all=0.05, random_state=42)
+svd_model.fit(full_train)
+print(f"   ✓ SVD Model trained (n_factors={best_num_factors})")
+
+# ============================================================================
+# BƯỚC 6: EXPORT thành .pkl FILES
+# ============================================================================
+print("\n6. Exporting to .pkl files...")
 
 # Export TF-IDF Vectorizer
 joblib.dump(tfidf_vectorizer, 'tfidf_vectorizer.pkl')
@@ -149,12 +180,23 @@ print(f"   ✓ Saved: isbn_map.pkl")
 joblib.dump(knn_model, 'knn_model.pkl')
 print(f"   ✓ Saved: knn_model.pkl")
 
+# Export Cosine Similarity Matrix
+joblib.dump(cosine_sim, 'cosine_sim.pkl')
+print(f"   ✓ Saved: cosine_sim.pkl ({cosine_sim.nbytes / 1024 / 1024:.2f} MB)")
+
+# Export SVD Model
+joblib.dump(svd_model, 'svd_model.pkl')
+print(f"   ✓ Saved: svd_model.pkl")
+
 print("\n" + "=" * 70)
-print("✓ TRẠM 1 HOÀN TẤT!")
 print("=" * 70)
 print("\nCác file đã tạo:")
 print("  1. tfidf_vectorizer.pkl  - Vectorizer để transform text (với genres)")
 print("  2. tfidf_matrix.pkl      - Ma trận TF-IDF toàn bộ sách")
 print("  3. isbn_map.pkl          - Bản đồ ISBN ↔ Index")
 print("  4. knn_model.pkl         - Mô hình KNN (Item-Item collaborative filtering)")
-print("\nNhớ di chuyển 4 file này vào thư mục project trước khi chạy app.py!")
+print("  5. cosine_sim.pkl        - Ma trận cosine similarity (Content-Based)")
+print("  6. svd_model.pkl         - Mô hình SVD (Matrix Factorization collaborative filtering)")
+print("\nCơ chế scoring kết hợp:")
+print("  final_score = 0.2 * content_based + 0.3 * knn + 0.5 * svd")
+print("\nNhớ di chuyển 6 file này vào thư mục project trước khi chạy app.py!")

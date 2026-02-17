@@ -1,12 +1,33 @@
-# Bỏ qua môi trường ảo
+# Environment
 venv/
 env/
-.env/
-
-# Bỏ qua các file cache của Python
-__pycache__/
 *.pyc
-
-# Bỏ qua các file môi trường chứa API key/mật khẩu (nếu có)
+__pycache__/
+.Python
 .env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Generated files
 *.pkl
+books_data.db
+app.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build/Distribution
+build/
+dist/
+*.egg-info/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
