@@ -14,7 +14,8 @@ logger = setup_logger(__name__)
 
 def check_and_setup():
     """
-    Check if models and database exist, run setup scripts if needed
+    Check if models and database exist
+    Models must be imported from Google Drive (pre-trained)
     """
     logger.info("=" * 70)
     logger.info("INITIALIZATION: Checking models and database...")
@@ -24,8 +25,12 @@ def check_and_setup():
     database_exists = check_database_exists()
     
     if not models_exist:
-        logger.warning("⚠️  Models not found. Running export_models.py...")
-        run_export_models()
+        logger.error("❌ Models not found!")
+        logger.error("Please download pre-trained models from Google Drive")
+        logger.error("Expected .pkl files to be in project root:")
+        for key, path in MODEL_FILE_PATHS.items():
+            logger.error(f"   - {key}: {path}")
+        raise FileNotFoundError("Model files not found. Please download from Google Drive.")
     else:
         logger.info("✓ All required model files exist")
     
@@ -58,34 +63,6 @@ def check_models_exist():
     
     logger.info(f"✓ All {len(MODEL_FILE_PATHS)} model files found")
     return True
-
-def run_export_models():
-    """
-    Run export_models.py script
-    """
-    try:
-        script_path = Path(__file__).parent.parent / 'scripts' / 'export_models.py'
-        
-        if not script_path.exists():
-            raise FileNotFoundError(f"Script not found: {script_path}")
-        
-        logger.info(f"Running {script_path.name}...")
-        result = subprocess.run(
-            ['python3', str(script_path)],
-            capture_output=True,
-            text=True,
-            timeout=SCRIPTS_CONFIG['export_models_timeout']
-        )
-        
-        if result.returncode == 0:
-            logger.info("✓ Models exported successfully!")
-        else:
-            logger.error(f"❌ Model export failed:\n{result.stderr}")
-            raise RuntimeError("Failed to export models")
-            
-    except Exception as e:
-        logger.error(f"❌ Error running export_models: {e}")
-        raise
 
 def run_create_database():
     """

@@ -27,7 +27,7 @@ CSV_FILES = {
 }
 
 # Models configuration
-MODELS_DIR = PROJECT_ROOT
+MODELS_DIR = PROJECT_ROOT / 'pkl'
 MODEL_FILES = {
     'tfidf_vectorizer': 'tfidf_vectorizer.pkl',
     'tfidf_matrix': 'tfidf_matrix.pkl',

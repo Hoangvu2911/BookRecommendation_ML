@@ -10,11 +10,22 @@ Architecture:
 - API: routes and endpoints
 - Core: recommender.py (recommendation logic)
 
+Setup:
+1. Download pre-trained models from Google Drive and place in project root:
+   - tfidf_vectorizer.pkl
+   - tfidf_matrix.pkl
+   - cosine_sim.pkl
+   - knn_model.pkl
+   - svd_model.pkl
+   - isbn_map.pkl
+
+2. Run create_database.py to initialize the database
+
 Usage:
     python app.py
 
 The server will automatically:
-1. Check if models exist, run export_models.py if needed
+1. Check if models exist (must be downloaded from Google Drive)
 2. Check if database exists, run create_database.py if needed
 3. Load all models and data into memory
 4. Start Flask server on http://localhost:5000

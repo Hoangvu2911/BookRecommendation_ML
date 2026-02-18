@@ -6,6 +6,7 @@ Implements the combined scoring mechanism from Model.ipynb
 
 import pandas as pd
 import joblib
+import os
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -28,18 +29,21 @@ class Recommender:
         self.book_df = book_df
         self.rating_df = rating_df
         
-        # Load pre-trained models
-        print("Loading pre-trained models...")
+        # Load pre-trained models from pkl folder
+        print("Loading pre-trained models from pkl folder...")
         try:
-            self.tfidf_matrix = joblib.load('tfidf_matrix.pkl')
-            self.cosine_sim = joblib.load('cosine_sim.pkl')
-            self.knn_model = joblib.load('knn_model.pkl')
-            self.svd_model = joblib.load('svd_model.pkl')
-            self.isbn_map = joblib.load('isbn_map.pkl')
+            # Path to pkl folder
+            pkl_folder = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'pkl')
+            
+            self.tfidf_matrix = joblib.load(os.path.join(pkl_folder, 'tfidf_matrix.pkl'))
+            self.cosine_sim = joblib.load(os.path.join(pkl_folder, 'cosine_sim.pkl'))
+            self.knn_model = joblib.load(os.path.join(pkl_folder, 'knn_model.pkl'))
+            self.svd_model = joblib.load(os.path.join(pkl_folder, 'svd_model.pkl'))
+            self.isbn_map = joblib.load(os.path.join(pkl_folder, 'isbn_map.pkl'))
             print("✓ All models loaded successfully")
         except FileNotFoundError as e:
             print(f"✗ Error loading models: {e}")
-            print("Please run export_models.py first to generate the .pkl files")
+            print(f"Please download .pkl files from Google Drive and place them in: {pkl_folder}/")
             raise
     
     def get_user_history(self, user_id):
@@ -136,8 +140,11 @@ class Recommender:
         """
         Get top N book recommendations for a user using combined scoring
         
-        Combined Score Formula:
-        final_score = 0.2 * content_based + 0.3 * knn + 0.5 * svd
+        Combined Score Formula (matches Model.ipynb):
+        if sum_sim == 0:
+            final_score = 0 + 0.3 * knn + 0.5 * svd
+        else:
+            final_score = 0.2 * content_based + 0.3 * knn + 0.5 * svd
         
         Args:
             user_id: User ID
@@ -162,7 +169,7 @@ class Recommender:
                 continue
             
             # Calculate scores from three models
-            content_score = self.calculate_content_score(idx, user_df) * 10  # Scale to 1-10 range
+            content_score = self.calculate_content_score(idx, user_df)  # No scaling - already 0-10 range
             knn_score = self.calculate_knn_score(user_id, isbn)
             svd_score = self.calculate_svd_score(user_id, isbn)
             
