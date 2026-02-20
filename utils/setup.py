@@ -25,23 +25,23 @@ def check_and_setup():
     database_exists = check_database_exists()
     
     if not models_exist:
-        logger.error("❌ Models not found!")
+        logger.error("Models not found!")
         logger.error("Please download pre-trained models from Google Drive")
         logger.error("Expected .pkl files to be in project root:")
         for key, path in MODEL_FILE_PATHS.items():
             logger.error(f"   - {key}: {path}")
         raise FileNotFoundError("Model files not found. Please download from Google Drive.")
     else:
-        logger.info("✓ All required model files exist")
+        logger.info("All required model files exist")
     
     if not database_exists:
-        logger.warning("⚠️  Database not found. Running create_database.py...")
+        logger.warning("Database not found. Running create_database.py...")
         run_create_database()
     else:
-        logger.info("✓ Database exists and is valid")
+        logger.info("Database exists and is valid")
     
     logger.info("=" * 70)
-    logger.info("✓ INITIALIZATION COMPLETE")
+    logger.info("INITIALIZATION COMPLETE")
     logger.info("=" * 70)
 
 def check_models_exist():
@@ -61,7 +61,7 @@ def check_models_exist():
         logger.warning(f"Missing models: {', '.join(missing)}")
         return False
     
-    logger.info(f"✓ All {len(MODEL_FILE_PATHS)} model files found")
+    logger.info(f"All {len(MODEL_FILE_PATHS)} model files found")
     return True
 
 def run_create_database():
@@ -83,11 +83,11 @@ def run_create_database():
         )
         
         if result.returncode == 0:
-            logger.info("✓ Database created successfully!")
+            logger.info("Database created successfully!")
         else:
-            logger.error(f"❌ Database creation failed:\n{result.stderr}")
+            logger.error(f"Database creation failed:\n{result.stderr}")
             raise RuntimeError("Failed to create database")
             
     except Exception as e:
-        logger.error(f"❌ Error running create_database: {e}")
+        logger.error(f"Error running create_database: {e}")
         raise

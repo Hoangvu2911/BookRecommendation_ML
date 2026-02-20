@@ -213,7 +213,7 @@ def register_routes(app):
                 'recommendations': enriched_recs
             }
             
-            logger.info(f"✓ User {user_id}: {len(enriched_recs)} recommendations")
+            logger.info(f"User {user_id}: {len(enriched_recs)} recommendations")
             return jsonify(response), 200
             
         except ValueError:

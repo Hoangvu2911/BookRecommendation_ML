@@ -28,45 +28,36 @@ class ModelManager:
         Returns:
             bool: True if all models loaded successfully
         """
-        logger.info("🧠 Loading all models and data...")
+        logger.info("Loading all models and data...")
         
         try:
             # Load model files
-            self.models['tfidf_vectorizer'] = joblib.load(MODEL_FILE_PATHS['tfidf_vectorizer'])
-            logger.info("✓ Loaded TF-IDF Vectorizer")
-            
-            self.models['tfidf_matrix'] = joblib.load(MODEL_FILE_PATHS['tfidf_matrix'])
-            logger.info(f"✓ Loaded TF-IDF Matrix: {self.models['tfidf_matrix'].shape}")
-            
-            self.models['isbn_map'] = joblib.load(MODEL_FILE_PATHS['isbn_map'])
-            logger.info(f"✓ Loaded ISBN Map: {len(self.models['isbn_map']['isbn_to_index'])} books")
-            
             self.models['cosine_sim'] = joblib.load(MODEL_FILE_PATHS['cosine_sim'])
-            logger.info(f"✓ Loaded Cosine Similarity Matrix: {self.models['cosine_sim'].shape}")
+            logger.info(f"Loaded Cosine Similarity Matrix: {self.models['cosine_sim'].shape}")
             
             self.models['knn_model'] = joblib.load(MODEL_FILE_PATHS['knn_model'])
-            logger.info("✓ Loaded KNN Model")
+            logger.info("Loaded KNN Model")
             
             self.models['svd_model'] = joblib.load(MODEL_FILE_PATHS['svd_model'])
-            logger.info("✓ Loaded SVD Model")
+            logger.info("Loaded SVD Model")
             
             # Load data files
-            logger.info("📚 Loading data files...")
+            logger.info("Loading data files...")
             self.data['books'] = pd.read_csv(
                 CSV_FILES['books'],
                 usecols=['ISBN', 'Title', 'Author', 'description', 'genres']
             )
-            logger.info(f"✓ Loaded {len(self.data['books'])} books")
+            logger.info(f"Loaded {len(self.data['books'])} books")
             
             self.data['ratings'] = pd.read_csv(CSV_FILES['ratings'])
-            logger.info(f"✓ Loaded {len(self.data['ratings'])} ratings")
+            logger.info(f"Loaded {len(self.data['ratings'])} ratings")
             
             self.loaded = True
-            logger.info("✓ All models and data loaded successfully")
+            logger.info("All models and data loaded successfully")
             return True
             
         except Exception as e:
-            logger.error(f"❌ Error loading models: {e}")
+            logger.error(f"Error loading models: {e}")
             self.loaded = False
             return False
     

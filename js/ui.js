@@ -63,7 +63,7 @@ class UIManager {
                 if (recommendations.length > 0) {
                     recommendationsHtml = `
                         <div class="recommendations-section">
-                            <h3>📚 Similar Books You Might Like</h3>
+                            <h3>Similar Books You Might Like</h3>
                             <div class="rec-type-info">
                                 Recommendations based on book description similarity (TF-IDF)
                             </div>

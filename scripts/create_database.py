@@ -1,6 +1,5 @@
-#!/usr/bin/env python3
 """
-STEP 4: Create SQLite Database with Full-Text Search
+Create SQLite Database with Full-Text Search
 """
 
 import sqlite3
@@ -8,27 +7,27 @@ import pandas as pd
 import os
 
 print("=" * 60)
-print("STEP 4: Creating SQLite Database with Full-Text Search")
+print("Creating SQLite Database with Full-Text Search")
 print("=" * 60)
 
 # Remove existing database if it exists
 if os.path.exists('books_data.db'):
     os.remove('books_data.db')
-    print("\n✓ Removed existing database")
+    print("\nRemoved existing database")
 
 # Connect to database
 conn = sqlite3.connect('books_data.db')
 cursor = conn.cursor()
 
-# Load data (TRẠM 2: Chỉ load top5, books, images - không load recommendations)
+# Load data
 print("\n1. Loading data from CSV files...")
 
-# Load top 5 - có thể từ file hoặc tính từ rating
+# Load top 5
 top5_file = 'data/top5.csv'
 if os.path.exists(top5_file):
     top5_df = pd.read_csv(top5_file, header=None, names=['ISBN'])
 else:
-    print(f"   ⚠️  {top5_file} not found, computing top 5 from ratings...")
+    print(f"   {top5_file} not found, computing top 5 from ratings...")
     # Compute top 5 books by average rating
     rating_df = pd.read_csv('data/rating.csv')
     top5_books = rating_df.groupby('ISBN').agg({
@@ -38,7 +37,7 @@ else:
     top5_books = top5_books[top5_books['count'] >= 5]  # At least 5 ratings
     top5_books = top5_books.nlargest(5, 'avg_rating')
     top5_df = top5_books[['ISBN']].copy()
-    print(f"   ✓ Computed top 5 books from {len(rating_df)} ratings")
+    print(f"   Computed top 5 books from {len(rating_df)} ratings")
 
 des_cross_df = pd.read_csv('data/des_cross.csv')
 des_book_df = pd.read_csv('data/des_book.csv')  # Contains Image URLs
@@ -46,14 +45,14 @@ des_book_df = pd.read_csv('data/des_book.csv')  # Contains Image URLs
 print(f"   Top 5: {len(top5_df)} books")
 print(f"   Books data: {len(des_cross_df)} books")
 print(f"   Book images (des_book): {len(des_book_df)} books")
-print("   ℹ️  Note: Recommendations will be computed real-time using .pkl models")
+print("   Note: Recommendations will be computed real-time using .pkl models")
 
 # Merge image URLs from des_book
 print("   Merging image URLs...")
 image_url_map = {}
 for idx, row in des_book_df.iterrows():
     image_url_map[row['ISBN']] = row.get('Image-URL-M', None) or row.get('Image-URL-L', None) or row.get('Image-URL-S', None)
-print(f"   ✓ Found {len(image_url_map)} image URLs")
+print(f"   Found {len(image_url_map)} image URLs")
 
 # Create books table with full description
 print("\n2. Creating books table...")
@@ -93,7 +92,7 @@ for idx, row in des_cross_df.iterrows():
         pass
 
 conn.commit()
-print(f"   ✓ Inserted {len(des_cross_df)} books")
+print(f"   Inserted {len(des_cross_df)} books")
 
 # Create FTS (Full-Text Search) virtual table
 print("\n3. Creating Full-Text Search index...")
@@ -113,7 +112,7 @@ INSERT INTO books_fts (rowid, isbn, title, author)
 SELECT rowid, isbn, title, author FROM books
 ''')
 conn.commit()
-print("   ✓ FTS index created")
+print("   FTS index created")
 
 # Create top5 table
 print("\n4. Creating top5 table...")
@@ -127,13 +126,13 @@ for idx, row in top5_df.iterrows():
     cursor.execute('INSERT INTO top5 (isbn) VALUES (?)', (row['ISBN'],))
 
 conn.commit()
-print(f"   ✓ Inserted {len(top5_df)} top books")
+print(f"   Inserted {len(top5_df)} top books")
 
 # Create indexes for faster queries
 print("\n5. Creating indexes...")
 cursor.execute('CREATE INDEX IF NOT EXISTS idx_books_isbn ON books(isbn)')
 conn.commit()
-print("   ✓ Indexes created")
+print("   Indexes created")
 
 # Test the database
 print("\n6. Testing database queries...")
@@ -144,7 +143,7 @@ SELECT b.isbn, b.title, b.author FROM books b
 WHERE b.isbn IN (SELECT isbn FROM top5)
 ''')
 top5_books = cursor.fetchall()
-print(f"   ✓ Top 5 test: Found {len(top5_books)} books")
+print(f"   Top 5 test: Found {len(top5_books)} books")
 for isbn, title, author in top5_books:
     print(f"      {isbn}: {title} by {author}")
 
@@ -156,27 +155,24 @@ WHERE books_fts MATCH 'Harry'
 LIMIT 3
 ''')
 search_results = cursor.fetchall()
-print(f"   ✓ Search test: Found {len(search_results)} results for 'Harry'")
+print(f"   Search test: Found {len(search_results)} results for 'Harry'")
 
 conn.close()
 
 print("\n" + "=" * 60)
-print("✓ DATABASE CREATED SUCCESSFULLY (TRẠM 2 - Lightweight)")
+print("DATABASE CREATED SUCCESSFULLY")
 print("=" * 60)
 print("\nDatabase file: books_data.db")
 print("Tables created:")
-print("  ✓ books: Main book information with FTS search (metadata only)")
-print("  ✓ books_fts: Full-text search index")
-print("  ✓ top5: Top 5 rated books")
+print("  books: Main book information with FTS search (metadata only)")
+print("  books_fts: Full-text search index")
+print("  top5: Top 5 rated books")
 print("\nTables NOT included:")
-print("  ✗ recommendations: Computed real-time using models")
-print("\nModel files required at runtime (6 files from export_models.py):")
-print("  1. tfidf_vectorizer.pkl     - TF-IDF vectorizer")
-print("  2. tfidf_matrix.pkl         - TF-IDF sparse matrix")
-print("  3. isbn_map.pkl             - ISBN to/from index mapping")
-print("  4. knn_model.pkl            - KNN model (Item-Item CF)")
-print("  5. cosine_sim.pkl           - Cosine similarity matrix")
-print("  6. svd_model.pkl            - SVD model (Matrix Factorization)")
+print("  recommendations: Computed real-time using models")
+print("\nModel files required at runtime (3 files from export_models.py):")
+print("  1. cosine_sim.pkl           - Cosine similarity matrix")
+print("  2. knn_model.pkl            - KNN model (Item-Item CF)")
+print("  3. svd_model.pkl            - SVD model (Matrix Factorization)")
 print("\nRecommendation Strategy:")
 print("  final_score = 0.2 * content_based + 0.3 * knn + 0.5 * svd")
 print("\nReady for server startup with combined recommendation engine!")

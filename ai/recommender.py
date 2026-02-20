@@ -35,14 +35,12 @@ class Recommender:
             # Path to pkl folder
             pkl_folder = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'pkl')
             
-            self.tfidf_matrix = joblib.load(os.path.join(pkl_folder, 'tfidf_matrix.pkl'))
             self.cosine_sim = joblib.load(os.path.join(pkl_folder, 'cosine_sim.pkl'))
             self.knn_model = joblib.load(os.path.join(pkl_folder, 'knn_model.pkl'))
             self.svd_model = joblib.load(os.path.join(pkl_folder, 'svd_model.pkl'))
-            self.isbn_map = joblib.load(os.path.join(pkl_folder, 'isbn_map.pkl'))
-            print("✓ All models loaded successfully")
+            print("All models loaded successfully")
         except FileNotFoundError as e:
-            print(f"✗ Error loading models: {e}")
+            print(f"Error loading models: {e}")
             print(f"Please download .pkl files from Google Drive and place them in: {pkl_folder}/")
             raise
     
@@ -59,7 +57,7 @@ class Recommender:
         user_rating_list = self.rating_df[self.rating_df['User-ID'] == user_id][['ISBN', 'Rating']]
         
         if len(user_rating_list) == 0:
-            print(f"⚠️  User {user_id} has no ratings in the system")
+            print(f"User {user_id} has no ratings in the system")
             return pd.DataFrame()
         
         # Map ISBN to book index
@@ -226,7 +224,7 @@ if __name__ == "__main__":
     print("\n1. Loading data...")
     book_df = pd.read_csv('data/book.csv', usecols=['ISBN', 'Title', 'Author', 'description', 'genres'])
     rating_df = pd.read_csv('data/rating.csv')
-    print(f"   ✓ Loaded {len(book_df)} books and {len(rating_df)} ratings")
+    print(f"   Loaded {len(book_df)} books and {len(rating_df)} ratings")
     
     # Initialize recommender
     print("\n2. Initializing recommender...")
@@ -244,5 +242,5 @@ if __name__ == "__main__":
         print(f"      ISBN: {rec['isbn']} | Score: {rec['score']:.2f}/10")
     
     print("\n" + "=" * 70)
-    print("✓ RECOMMENDER TEST COMPLETE")
+    print("RECOMMENDER TEST COMPLETE")
     print("=" * 70)

@@ -11,13 +11,10 @@ Architecture:
 - Core: recommender.py (recommendation logic)
 
 Setup:
-1. Download pre-trained models from Google Drive and place in project root:
-   - tfidf_vectorizer.pkl
-   - tfidf_matrix.pkl
+1. Download pre-trained models from Google Drive and place in pkl folder:
    - cosine_sim.pkl
    - knn_model.pkl
    - svd_model.pkl
-   - isbn_map.pkl
 
 2. Run create_database.py to initialize the database
 
@@ -79,22 +76,22 @@ def main():
     
     try:
         # Step 1: Initialize (check and setup models/database)
-        logger.info("\n📋 STEP 1: System Initialization")
+        logger.info("\nSTEP 1: System Initialization")
         check_and_setup()
         
         # Step 2: Load models
-        logger.info("\n🤖 STEP 2: Loading AI Models")
+        logger.info("\nSTEP 2: Loading AI Models")
         model_manager = get_model_manager()
         if not model_manager.load_all_models():
             raise RuntimeError("Failed to load models")
         
         # Step 3: Create Flask app
-        logger.info("\n🚀 STEP 3: Starting Flask Server")
+        logger.info("\nSTEP 3: Starting Flask Server")
         app = create_app()
         
         # Step 4: Print server info
         logger.info("\n" + "=" * 80)
-        logger.info("✓ SERVER READY!")
+        logger.info("SERVER READY!")
         logger.info("=" * 80)
         logger.info(f"\nServer: http://{FLASK_CONFIG['host']}:{FLASK_CONFIG['port']}")
         logger.info("\nAPI Endpoints:")
@@ -118,7 +115,7 @@ def main():
         )
         
     except Exception as e:
-        logger.error(f"❌ FATAL ERROR: {e}")
+        logger.error(f"FATAL ERROR: {e}")
         logger.error("Server startup failed")
         sys.exit(1)
 
